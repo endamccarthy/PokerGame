@@ -51,6 +51,11 @@ public class Hand {
 		Arrays.sort(hand);
 		return deck;
 	}
+	public void generateHand() {
+		for(i = 0; i < Main.CARDS_PER_PLAYER; i++)
+			hand[i] = Main.deck.drawCard();
+		Arrays.sort(hand);
+	}
 	
 	/**
 	 * CHECK HAND
