@@ -34,8 +34,8 @@ public class Player {
 		else return false;
 	}
 	
-	public void openGame() {
-		setCoins(-1);
+	public void replaceCard(int cardToReplace) {
+		hand.hand[cardToReplace] = Main.deck.drawCard();
 	}
 
 }

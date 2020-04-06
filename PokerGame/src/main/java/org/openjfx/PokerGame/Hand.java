@@ -21,7 +21,7 @@ public class Hand {
 	 * 				   	Hand 2: {2, 5, 7, 9, 11}  =>  highestCard is 11
 	 * ignore		-- used to ignore a value when checking for a pair (used in full house and two pair)
 	 */
-	private Card[] hand;
+	public Card[] hand;
 	private int highestCard, ignore, temp, i, j, k, l;
 	private String toString;
 	
