@@ -22,8 +22,9 @@ public class Hand {
 	 * ignore		-- used to ignore a value when checking for a pair (used in full house and two pair)
 	 */
 	public Card[] hand;
-	private int highestCard, ignore, temp, i, j, k, l;
+	private int highestCard, ignore, temp, i, j, k, l, m;
 	private String toString;
+	public boolean[] valuableCards;
 	
 	/**
 	 * CONSTRUCTOR
@@ -32,6 +33,9 @@ public class Hand {
 	 */
 	public Hand() {
 		hand = new Card[Main.CARDS_PER_PLAYER];
+		valuableCards = new boolean[Main.CARDS_PER_PLAYER];
+		for(i = 0; i < valuableCards.length; i++)
+			valuableCards[i] = false;
 	}
 	
 	/**
@@ -79,8 +83,15 @@ public class Hand {
 		else if (checkForStraight(hand)) return 400 + highestCard;
 		else if (checkForTriple(hand)) return 300 + highestCard;
 		else if (checkForTwoPair(hand)) return 200 + highestCard;
-		else if (checkForPair(hand)) return 100 + highestCard;
-		else return highestCard;
+		else if (checkForPair(hand)) {
+			determineValuableKickers();
+			return 100 + highestCard;
+		}
+		else {
+			valuableCards[valuableCards.length - 1] = true;
+			determineValuableKickers();
+			return highestCard;
+		}
 	}
 	
 	/**
@@ -94,6 +105,8 @@ public class Hand {
 	 */
 	private boolean checkForRoyalFlush(Card[] hand) {
 		if (checkForFlush(hand) && checkForStraight(hand) && highestCard == Card.VALUES.length - 1) {
+			for(i = 0; i < valuableCards.length; i++)
+				valuableCards[i] = true;
 			return true;
 		}
 		return false;
@@ -123,12 +136,19 @@ public class Hand {
 	 * @return boolean
 	 */
 	private boolean checkForFourOfAKind(Card[] hand) {
+		for(i = 0; i < valuableCards.length; i++)
+			valuableCards[i] = false;
 		for(i = 0; i < hand.length; i++)
 			for(j = i + 1; j < hand.length; j++)
 				for(k = j + 1; k < hand.length; k++)
 					for(l = k + 1; l < hand.length; l++)
 						if ((hand[i].getValue() == hand[j].getValue()) && (hand[j].getValue() == hand[k].getValue()) && (hand[k].getValue() == hand[l].getValue())) {
 							highestCard = hand[i].getValue();
+							valuableCards[i] = true;
+							valuableCards[j] = true;
+							valuableCards[k] = true;
+							valuableCards[l] = true;
+							determineValuableKickers();
 							return true;
 						}
 		return false;
@@ -151,6 +171,8 @@ public class Hand {
 			// checkForPair will ignore the triple cards already found
 			if (checkForPair(hand, highestCard)) {
 				highestCard = temp;
+				for(i = 0; i < valuableCards.length; i++)
+					valuableCards[i] = true;
 				return true;
 			}
 		}
@@ -170,6 +192,8 @@ public class Hand {
 			if (hand[0].getSuit() != hand[i].getSuit())
 				return false;
 		highestCard = hand[hand.length - 1].getValue();
+		for(i = 0; i < valuableCards.length; i++)
+			valuableCards[i] = true;
 		return true;
 	}
 	
@@ -186,6 +210,8 @@ public class Hand {
 			if (hand[i].getValue() != (hand[i + 1].getValue() - 1))
 				return false;
 		highestCard = hand[hand.length - 1].getValue();
+		for(i = 0; i < valuableCards.length; i++)
+			valuableCards[i] = true;
 		return true;
 	}
 	
@@ -204,6 +230,10 @@ public class Hand {
 				for(k = j + 1; k < hand.length; k++)
 					if ((hand[i].getValue() == hand[j].getValue()) && (hand[j].getValue() == hand[k].getValue())) {
 						highestCard = hand[i].getValue();
+						valuableCards[i] = true;
+						valuableCards[j] = true;
+						valuableCards[k] = true;
+						determineValuableKickers();
 						return true;
 					}
 		return false;
@@ -220,8 +250,10 @@ public class Hand {
 	 */
 	private boolean checkForTwoPair(Card[] hand) {
 		// as the hand is sorted the second half of the conditional will find the highest pair
-		if (checkForPair(hand) && checkForPair(hand, highestCard))
+		if (checkForPair(hand) && checkForPair(hand, highestCard)) {
+			determineValuableKickers();
 			return true;
+		}
 		return false;
 	}
 	
@@ -261,12 +293,23 @@ public class Hand {
 				if ((hand[i].getValue() == hand[j].getValue())) {
 					highestCard = hand[i].getValue();
 					ignore = -1; // reset ignore to invalid value
+					valuableCards[i] = true;
+					valuableCards[j] = true;
 					return true;
 				}
 		}
 		ignore = -1; // reset ignore to invalid value
 		return false;
 	}
+	
+	
+	private void determineValuableKickers() {
+		// if each kicker card is a 10 (index 8) or higher, then keep this card also
+		for(m = 0; m < valuableCards.length; m++)
+			if(!valuableCards[m] && hand[m].getValue() >= 8)
+				valuableCards[m] = true;
+	}
+	
 	
 	/**
 	 * TEST HAND

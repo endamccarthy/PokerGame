@@ -55,10 +55,19 @@ public class Deck {
 	 * @return index of object value in VALUES
 	 */
 	public Card drawCard() {
-		random = new Random();
-		drawnCard = deck.get(random.nextInt(deck.size()));
-		deck.remove(drawnCard);
-		return drawnCard;
+		if(deck.size() >= 1) {
+			random = new Random();
+			drawnCard = deck.get(random.nextInt(deck.size()));
+			deck.remove(drawnCard);
+			return drawnCard;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public int deckSize() {
+		return deck.size();
 	}
 	
 	/**

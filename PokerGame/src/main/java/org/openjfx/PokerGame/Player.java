@@ -1,5 +1,7 @@
 package org.openjfx.PokerGame;
 
+import java.util.Arrays;
+
 public class Player {
 	
 	final private static int STARTING_COINS = 10;
@@ -35,7 +37,22 @@ public class Player {
 	}
 	
 	public void replaceCard(int cardToReplace) {
-		hand.hand[cardToReplace] = Main.deck.drawCard();
+		if(Main.deck.deckSize() >= 1)
+			hand.hand[cardToReplace] = Main.deck.drawCard();
+	}
+	
+	public void sortHand() {
+		Arrays.sort(hand.hand);
+	}
+	
+	public boolean checkIfValuableCard(int cardIndex) {
+		return hand.valuableCards[cardIndex];
+	}
+	
+	public void test() {
+		int[] testValues = new int[] {2,3,4,5,6};
+		int[] testSuites = new int[] {3,2,3,1,3};
+		hand.testHand(testValues, testSuites);
 	}
 
 }
