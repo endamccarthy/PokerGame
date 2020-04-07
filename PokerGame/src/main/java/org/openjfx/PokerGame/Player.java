@@ -4,10 +4,9 @@ import java.util.Arrays;
 
 public class Player {
 	
-	final private static int STARTING_COINS = 10;
+	final private static int STARTING_COINS = 5;
 	private Hand hand;
 	private int coins;
-	private int minOpen = 109;
 	
 	public Player() {
 		setCoins(STARTING_COINS);
@@ -31,11 +30,6 @@ public class Player {
 		hand.generateHand();
 	}
 	
-	public boolean canOpen() {
-		if(hand.checkHand() >= minOpen) return true;
-		else return false;
-	}
-	
 	public void replaceCard(int cardToReplace) {
 		if(Main.deck.deckSize() >= 1)
 			hand.hand[cardToReplace] = Main.deck.drawCard();
@@ -49,9 +43,13 @@ public class Player {
 		return hand.valuableCards[cardIndex];
 	}
 	
+	public int checkHand() {
+		return hand.checkHand();
+	}
+	
 	public void test() {
-		int[] testValues = new int[] {2,3,4,5,6};
-		int[] testSuites = new int[] {3,2,3,1,3};
+		int[] testValues = new int[] {6,6,9,9,12};
+		int[] testSuites = new int[] {3,1,2,3,0};
 		hand.testHand(testValues, testSuites);
 	}
 

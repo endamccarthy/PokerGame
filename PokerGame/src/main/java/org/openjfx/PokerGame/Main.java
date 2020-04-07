@@ -2,8 +2,6 @@
 
 package org.openjfx.PokerGame;
 
-import java.util.Arrays;
-
 import javafx.application.Application;
 import javafx.beans.value.WritableBooleanValue;
 import javafx.stage.Stage;
@@ -11,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
@@ -21,15 +21,20 @@ public class Main extends Application {
 
 	final public static int CARDS_PER_PLAYER = 5;
 	final public static int ALLOWED_REFRESHABLE_CARDS = 4;
+	final private static int MIN_OPEN = 109; // pair of jacks
+	final private static int MIN_COMPUTER_PROCEED = 200; // two pair
+	final private static String[] OUTCOMES = new String[] {"High Card", "Pair", "Two Pair", "Triple", "Straight", "Flush", 
+			"Full House", "Four Of A Kind", "Straight Flush", "Royal Flush"};
 	
 	public static Deck deck;
 	private static Player computer;
 	private static Player you;
-	private static int pot, round;
+	private static int pot, tempCounter, round, betAmount;
+	private static int[] scores = new int[2];
 	
 	private static String actionLabelText;
-	private static Label coinsLabel, potLabel, handLabel, actionLabel;
-	private static Button startButton, openButton, nextRoundButton, refreshCardsButton, sortHandButton, quitGameButton;
+	private static Label headLabel, coinsLabel, potLabel, handLabel, actionLabel;
+	private static Button startButton, openButton, nextRoundButton, refreshCardsButton, checkButton, betButton, submitBetButton, quitGameButton;
 	private static Scene sceneLandingPage, sceneMainPage;
 	private static Stage window;
 
@@ -37,6 +42,9 @@ public class Main extends Application {
 	private static HBox layoutHorizontalButtons;
 	
 	CheckBox[] checkboxes = new CheckBox[CARDS_PER_PLAYER];
+	RadioButton betOne = new RadioButton("1"); 
+    RadioButton betTwo = new RadioButton("2"); 
+    RadioButton betThree = new RadioButton("3");
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -56,11 +64,12 @@ public class Main extends Application {
 		openButton = new Button("Yes");
 		nextRoundButton = new Button();
 		refreshCardsButton = new Button("Refresh Cards");
-		sortHandButton = new Button("Sort Hand");
-		quitGameButton = new Button("Quit Game");
+		checkButton = new Button("Check");
+		betButton = new Button("Bet");
+		submitBetButton = new Button("Submit Bet");
+		quitGameButton = new Button("Restart Game");
 		
 		layoutLandingPage = new VBox(10);
-		layoutMainPage = new VBox(10);
 		layoutHorizontalButtons = new HBox(10);
 		
 		layoutLandingPage.setAlignment(Pos.CENTER);
@@ -81,11 +90,14 @@ public class Main extends Application {
 		// when the user has selected to refresh certain cards...
 		refreshCardsButton.setOnAction(e -> refreshCards());
 		
-		// when the user has selected to sort the hand...
-		sortHandButton.setOnAction(e -> {
-			you.sortHand();
-			updateLabels();
-		});
+		// when the user has selected to check...
+		checkButton.setOnAction(e -> check());
+				
+		// when the user has selected to bet...
+		betButton.setOnAction(e -> bet());
+		
+		// when the user has submitted their bet...
+		submitBetButton.setOnAction(e -> submitBet());
 		
 		// if user wants to play again show home screen
 		quitGameButton.setOnAction(e -> window.setScene(sceneLandingPage));
@@ -99,24 +111,32 @@ public class Main extends Application {
 		you = new Player();
 		pot = 0;
 		round = 1;
+		headLabel = new Label();
 		coinsLabel = new Label();
 		potLabel = new Label();
 		handLabel = new Label();
 		actionLabel = new Label();
+		quitGameButton.setText("Restart game");
+		evaluateHands();
 		checkOpen();
 		updateLabels();
 	}
 	
+	private void evaluateHands() {
+		scores[0] = computer.checkHand();
+		scores[1] = you.checkHand();
+	}
+	
 	private void checkOpen() {
 		layoutHorizontalButtons.getChildren().clear();
-		if(computer.canOpen()) {
-			actionLabelText = "Computer can open.\nDo you want to play?";
+		if(scores[0] >= MIN_OPEN) {
+			actionLabelText = "Computer can open.\n\nDo you want to play?";
 			nextRoundButton.setText("No");
 			layoutHorizontalButtons.getChildren().addAll(openButton, nextRoundButton);
 		}
 		else {
-			if(you.canOpen()) {
-				actionLabelText = "Computer cannot open.\nYou can open. Do you want to play?";
+			if(scores[1] >= MIN_OPEN) {
+				actionLabelText = "Computer cannot open.\nYou can open.\n\nDo you want to play?";
 				nextRoundButton.setText("No");
 				layoutHorizontalButtons.getChildren().addAll(openButton, nextRoundButton);
 			}
@@ -139,6 +159,8 @@ public class Main extends Application {
 		int maxSel = ALLOWED_REFRESHABLE_CARDS;
 		for (int i = 0 ; i < checkboxes.length; i++) {
 			checkboxes[i] = new CheckBox();
+			if(!you.checkIfValuableCard(i))
+				checkboxes[i].setSelected(true);
 			checkboxes[i].selectedProperty().addListener((o, oldV, newV) -> {
 		        if(newV) {
 		            int selected = 0;
@@ -158,36 +180,135 @@ public class Main extends Application {
 	private void nextRound() {
 		deck = new Deck();
 		computer.setHand();
-		
-		computer.test();
-		
 		you.setHand();
+		
+		//you.test();
+		
 		round++;
+		evaluateHands();
 		checkOpen();
 		updateLabels();
 	}
 	
 	private void refreshCards() {
+		tempCounter = 0;
 		layoutHorizontalButtons.getChildren().clear();
 		for (int i = 0 ; i < checkboxes.length; i++) {
-			if(!computer.checkIfValuableCard(i))
+			if(!computer.checkIfValuableCard(i)) {
 				computer.replaceCard(i);
+				tempCounter++;
+			}
 			if(checkboxes[i].isSelected())
 				you.replaceCard(i);
 		}
+		you.sortHand();
 		computer.sortHand();
-		layoutHorizontalButtons.getChildren().addAll(sortHandButton);
+		evaluateHands();
+        
+		if(you.getCoins() <= 0 || computer.getCoins() <= 0)
+			layoutHorizontalButtons.getChildren().addAll(checkButton);
+		else
+			layoutHorizontalButtons.getChildren().addAll(checkButton, betButton);
+		
+		actionLabelText = String.format("(Computer has refreshed %d cards)\n\nWhat is your next move?", tempCounter);
+		
 		updateLabels();
 	}
 	
+	private void check() {
+		layoutHorizontalButtons.getChildren().clear();
+		actionLabelText = String.format("Computer's Hand:\n%s\n%s\n\n", computer.getHand(), OUTCOMES[scores[0] / 100]);
+		if(computer.checkHand() > you.checkHand()) {
+			actionLabelText += "Computer Wins :(";
+			computer.setCoins(pot);
+			pot = 0;
+		}
+		else if(computer.checkHand() < you.checkHand()){
+			actionLabelText += "You Win!";
+			you.setCoins(pot);
+			pot = 0;
+		}
+		else {
+			actionLabelText += "It's a draw!";
+			computer.setCoins(pot / 2);
+			you.setCoins(pot / 2);
+			pot = 0;
+		}
+		if(computer.getCoins() <= 0 || you.getCoins() <= 0) {
+			if(computer.getCoins() <= 0)
+				actionLabelText += "\n\nGame Over, The Computer Is Out Of Money!\nCongratulations, You've Won The Game!";
+			else if(you.getCoins() <= 0)
+				actionLabelText += "\n\nGame Over, You Are Out Of Money!\nUnfortunately, You've Lost The Game";
+			actionLabelText += "\n\nWould You Like To Play Again?";
+			quitGameButton.setText("Play Again");
+			updateLabels();
+			return;
+		}
+		nextRoundButton.setText("Next Round");
+		layoutHorizontalButtons.getChildren().addAll(nextRoundButton);
+		updateLabels();
+	}
+	
+	private void bet() {
+		layoutHorizontalButtons.getChildren().clear();
+		
+		ToggleGroup betAmountToggle = new ToggleGroup(); 
+		
+        betOne.setToggleGroup(betAmountToggle); 
+        betTwo.setToggleGroup(betAmountToggle); 
+        betThree.setToggleGroup(betAmountToggle);
+        
+        if(you.getCoins() >= 3 && computer.getCoins() >= 3)
+        	layoutHorizontalButtons.getChildren().addAll(betOne, betTwo, betThree, submitBetButton);
+        else if(you.getCoins() >= 2 && computer.getCoins() >= 2)
+        	layoutHorizontalButtons.getChildren().addAll(betOne, betTwo, submitBetButton);
+        else if(you.getCoins() >= 1 && computer.getCoins() >= 1)
+        	layoutHorizontalButtons.getChildren().addAll(betOne, submitBetButton);
+        else
+        	return;
+		actionLabelText = "How much would you like to bet?";
+		updateLabels();
+	}
+	
+	private void submitBet() {
+		if(betOne.isSelected())
+			betAmount = 1;
+		else if(betTwo.isSelected())
+			betAmount = 2;
+		else if(betThree.isSelected())
+			betAmount = 3;
+		else {
+			check();
+			return;
+		}
+		
+		if(scores[0] >= MIN_COMPUTER_PROCEED) {
+			computer.setCoins(-betAmount);
+			you.setCoins(-betAmount);
+			pot += betAmount * 2;
+			check();
+		}
+		else {
+			layoutHorizontalButtons.getChildren().clear();
+			actionLabelText = "Computer Folds, You Win The Pot!";
+			you.setCoins(pot);
+			pot = 0;
+			nextRoundButton.setText("Next Round");
+			layoutHorizontalButtons.getChildren().addAll(nextRoundButton);
+			updateLabels();
+		}
+	}
+	
+	
 	private void updateLabels() {
-		layoutMainPage = new VBox(10);
-		coinsLabel.setText(String.format("Coins:\nComputer:\t%d\nYou:\t\t%d", computer.getCoins(), you.getCoins()));
-		potLabel.setText(String.format("Pot: %d", pot));
-		handLabel.setText(String.format("Computer's Hand:\n%s\nYour Hand: \n%s", computer.getHand(), you.getHand()));
+		layoutMainPage = new VBox(20);
+		headLabel.setText(String.format("Round: %d", round));
+		coinsLabel.setText(String.format("Coins\nComputer:\t%d\nYou:\t\t%d", computer.getCoins(), you.getCoins()));
+		potLabel.setText(String.format("Pot\n%d", pot));
+		handLabel.setText(String.format("Your Hand: \n%s\n%s", you.getHand(), OUTCOMES[scores[1] / 100]));
 		actionLabel.setText(actionLabelText);
 		layoutMainPage.setPadding(new Insets(20, 20, 20, 20));
-		layoutMainPage.getChildren().addAll(coinsLabel, potLabel, handLabel, actionLabel, layoutHorizontalButtons, quitGameButton);
+		layoutMainPage.getChildren().addAll(headLabel, coinsLabel, potLabel, handLabel, actionLabel, layoutHorizontalButtons, quitGameButton);
 		sceneMainPage = new Scene(layoutMainPage, 400, 600);
 		window.setScene(sceneMainPage);
 	}

@@ -72,6 +72,8 @@ public class Hand {
 	 * @return integer value representing the strength of the hand
 	 */
 	public int checkHand() {
+		for(i = 0; i < valuableCards.length; i++)
+			valuableCards[i] = false;
 		// set ignore variable to an invalid number
 		ignore = -1;
 		highestCard = hand[hand.length - 1].getValue();
