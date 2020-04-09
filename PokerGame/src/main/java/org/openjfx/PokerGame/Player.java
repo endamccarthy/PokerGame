@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Player {
 	
-	final private static int STARTING_COINS = 5;
+	final private static int STARTING_COINS = 10;
 	private Hand hand;
 	private int coins;
 	

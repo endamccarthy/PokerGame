@@ -61,9 +61,8 @@ public class Deck {
 			deck.remove(drawnCard);
 			return drawnCard;
 		}
-		else {
+		else
 			return null;
-		}
 	}
 	
 	public int deckSize() {

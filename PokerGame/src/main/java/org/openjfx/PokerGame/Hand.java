@@ -22,9 +22,9 @@ public class Hand {
 	 * ignore		-- used to ignore a value when checking for a pair (used in full house and two pair)
 	 */
 	public Card[] hand;
+	public boolean[] valuableCards;
 	private int highestCard, ignore, temp, i, j, k, l, m;
 	private String toString;
-	public boolean[] valuableCards;
 	
 	/**
 	 * CONSTRUCTOR

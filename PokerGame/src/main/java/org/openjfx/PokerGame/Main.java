@@ -10,9 +10,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
@@ -41,13 +43,23 @@ public class Main extends Application {
 	private static VBox layoutLandingPage, layoutMainPage;
 	private static HBox layoutHorizontalButtons;
 	
+	private static Separator separator1, separator2, separator3;
+	
 	CheckBox[] checkboxes = new CheckBox[CARDS_PER_PLAYER];
-	RadioButton betOne = new RadioButton("1"); 
-    RadioButton betTwo = new RadioButton("2"); 
-    RadioButton betThree = new RadioButton("3");
+	RadioButton betOne = new RadioButton("1");
+	RadioButton betTwo = new RadioButton("2");
+	RadioButton betThree = new RadioButton("3");
 	
 	public static void main(String[] args) {
 		launch(args);
+		/*
+		try {
+			launch(args);
+		}
+		catch(Exception e) {
+			System.out.println("Error: Could not start application");
+		}		
+		*/
 	}
 
 	@Override
@@ -71,6 +83,10 @@ public class Main extends Application {
 		
 		layoutLandingPage = new VBox(10);
 		layoutHorizontalButtons = new HBox(10);
+		
+		separator1 = new Separator();
+		separator2 = new Separator();
+		separator3 = new Separator();
 		
 		layoutLandingPage.setAlignment(Pos.CENTER);
 		layoutLandingPage.setPadding(new Insets(20, 20, 20, 20));
@@ -116,6 +132,11 @@ public class Main extends Application {
 		potLabel = new Label();
 		handLabel = new Label();
 		actionLabel = new Label();
+		headLabel.setStyle("-fx-font: 24 arial;");
+		coinsLabel.setStyle("-fx-font: 13 arial; -fx-font-weight: bold;");
+		potLabel.setStyle("-fx-font: 13 arial; -fx-font-weight: bold;");
+		handLabel.setStyle("-fx-font: 15 arial; -fx-font-weight: bold;");
+		actionLabel.setStyle("-fx-font: 13 arial;");
 		quitGameButton.setText("Restart game");
 		evaluateHands();
 		checkOpen();
@@ -217,7 +238,7 @@ public class Main extends Application {
 	
 	private void check() {
 		layoutHorizontalButtons.getChildren().clear();
-		actionLabelText = String.format("Computer's Hand:\n%s\n%s\n\n", computer.getHand(), OUTCOMES[scores[0] / 100]);
+		actionLabelText = String.format("Computer's Hand:\n\n%s \t(%s)\n\n", computer.getHand(), OUTCOMES[scores[0] / 100]);
 		if(computer.checkHand() > you.checkHand()) {
 			actionLabelText += "Computer Wins :(";
 			computer.setCoins(pot);
@@ -302,14 +323,15 @@ public class Main extends Application {
 	
 	private void updateLabels() {
 		layoutMainPage = new VBox(20);
+		layoutMainPage.setStyle("-fx-background-color: #749c70;");
 		headLabel.setText(String.format("Round: %d", round));
-		coinsLabel.setText(String.format("Coins\nComputer:\t%d\nYou:\t\t%d", computer.getCoins(), you.getCoins()));
+		coinsLabel.setText(String.format("Coins\nComputer:\t%d\nYou:\t\t\t%d", computer.getCoins(), you.getCoins()));
 		potLabel.setText(String.format("Pot\n%d", pot));
-		handLabel.setText(String.format("Your Hand: \n%s\n%s", you.getHand(), OUTCOMES[scores[1] / 100]));
+		handLabel.setText(String.format("Your Hand:\n\n%s \t(%s)", you.getHand(), OUTCOMES[scores[1] / 100]));
 		actionLabel.setText(actionLabelText);
 		layoutMainPage.setPadding(new Insets(20, 20, 20, 20));
-		layoutMainPage.getChildren().addAll(headLabel, coinsLabel, potLabel, handLabel, actionLabel, layoutHorizontalButtons, quitGameButton);
-		sceneMainPage = new Scene(layoutMainPage, 400, 600);
+		layoutMainPage.getChildren().addAll(headLabel, separator1, coinsLabel, potLabel, separator2, handLabel, actionLabel, layoutHorizontalButtons, separator3, quitGameButton);
+		sceneMainPage = new Scene(layoutMainPage, 300, 550);
 		window.setScene(sceneMainPage);
 	}
 	
