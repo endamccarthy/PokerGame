@@ -8,19 +8,14 @@
  */
 
 package org.openjfx.PokerGame;
-
 import java.util.ArrayList;
 import java.util.Random;
 
 public class Deck {
 	
 	private ArrayList<Card> deck;
-	// drawnCard - an object of the Card class which is removed the deck when dealing
 	private Card card, drawnCard;
-	// random - used to draw a random card from the deck (instead of shuffling and popping from the top)
 	private Random random;
-	private int i, j;
-	private String toString;
 	
 	/**
 	 * CONSTRUCTOR
@@ -40,8 +35,8 @@ public class Deck {
 	 */
 	public void setDeck() {
 		deck = new ArrayList<Card>(Card.SUITES.length * Card.VALUES.length);
-		for(i = 0; i < Card.SUITES.length; i++)
-			for(j = 0; j < Card.VALUES.length; j++) {
+		for(int i = 0; i < Card.SUITES.length; i++)
+			for(int j = 0; j < Card.VALUES.length; j++) {
 				card = new Card(i, j);
 				deck.add(card);
 			}
@@ -75,8 +70,8 @@ public class Deck {
 	 * @return string containing the suit and the value of every card object in the deck
 	 */
 	public String toString() {
-		toString = "";
-		for(i = 0; i < deck.size(); i++)
+		String toString = "";
+		for(int i = 0; i < deck.size(); i++)
 			toString += deck.get(i).toString() + "\n";
 		return toString;
 	}

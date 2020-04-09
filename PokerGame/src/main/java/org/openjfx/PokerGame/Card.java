@@ -1,5 +1,5 @@
 /**
- * Card
+i * Card
  * 
  * A class used to store the details of a single playing card.
  * Implements the Comparable interface in order to compare the values of card objects.
@@ -9,7 +9,6 @@
  */
 
 package org.openjfx.PokerGame;
-
 import java.util.Arrays;
 
 public class Card implements Comparable<Card>{
