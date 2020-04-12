@@ -1,18 +1,23 @@
 /**
-i * Card
+ * Card
  * 
  * A class used to store the details of a single playing card.
  * Implements the Comparable interface in order to compare the values of card objects.
  * 
  * @author endamccarthy
- * Last Modified: 14/03/2020
+ * Last Modified: 12/04/2020
  */
 
 package org.openjfx.PokerGame;
 import java.util.Arrays;
 
+
+/**
+ * Implements the Comparable interface to compare 2 cards for sorting purposes.
+ */
 public class Card implements Comparable<Card>{
 	
+	/** Class constants and variables */
 	final public static String[] SUITES = new String[] {"♠", "♡", "♣", "♢"};
 	final public static String[] VALUES = new String[] {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
 	private String suit, value; // stores the suit and value of a Card object
@@ -90,10 +95,8 @@ public class Card implements Comparable<Card>{
 	 * @return 1, 0 or -1 (greater than, equal to or less than)
 	 */
 	public int compareTo(Card otherCard) {
-        if(this.getValue() > otherCard.getValue())
-            return 1;
-        else if (this.getValue() == otherCard.getValue())
-            return 0 ;
+        if(this.getValue() > otherCard.getValue()) return 1;
+        else if (this.getValue() == otherCard.getValue()) return 0 ;
         return -1 ;
     }
 	

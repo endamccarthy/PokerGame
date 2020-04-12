@@ -4,17 +4,19 @@
  * A class used to represent a deck of playing cards (ArrayList of Card classes).
  * 
  * @author endamccarthy
- * Last Modified: 14/03/2020
+ * Last Modified: 12/04/2020
  */
 
 package org.openjfx.PokerGame;
 import java.util.ArrayList;
 import java.util.Random;
 
+
 public class Deck {
 	
+	/** Class variables */
 	private ArrayList<Card> deck;
-	private Card card, drawnCard;
+	private Card card;
 	private Random random;
 	
 	/**
@@ -45,21 +47,26 @@ public class Deck {
 	/**
 	 * DRAW CARD
 	 *
-	 * Removes a random card from the deck, saves it to drawnCard and returns drawnCard.
+	 * Checks if deck has one or more cards left.
+	 * If so, removes a random card from the deck, saves it to drawnCard and returns drawnCard.
 	 * 
-	 * @return index of object value in VALUES
+	 * @return a Card object representing a card drawn from the deck
 	 */
 	public Card drawCard() {
 		if(deck.size() >= 1) {
 			random = new Random();
-			drawnCard = deck.get(random.nextInt(deck.size()));
+			Card drawnCard = deck.get(random.nextInt(deck.size()));
 			deck.remove(drawnCard);
 			return drawnCard;
 		}
-		else
-			return null;
+		else return null;
 	}
 	
+	/**
+	 * DECK SIZE
+	 * 
+	 * @return the amount of cards currently in the deck
+	 */
 	public int deckSize() {
 		return deck.size();
 	}
