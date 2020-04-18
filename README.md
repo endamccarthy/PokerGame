@@ -6,4 +6,4 @@ JavaFX Poker Game - Small College Project
 3. Deck (creates an ArrayList of 52 Card objects)
 4. Card (stores the value and suit of a single playing card)
 
-![Alt Text](pokerGame.gif)
+![Alt Text](PokerGame.gif)
